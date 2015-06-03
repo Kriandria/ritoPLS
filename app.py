@@ -30,5 +30,24 @@ def summoner():
 
         return render_template('summoner.html', summoner=request.form['name'], failure=error)
 
+@app.route('/status', methods=['GET', 'POST'])
+def status():
+    error = False
+    bad_name = False
+    if requests.method == 'POST':
+        server_name = request.form['name']
+        payload = {'api_key': 'e3ab974f-7a2f-417c-b31d-78c86c1dd190'}
+        
+        # attempt to query the riot games api for the status of requested server
+        s_info = requests.get("http://status.leagueoflegends.com/shards/{}".format(server_name), params = payload)
+        if s_info.status_code == 200:
+            print("The server {} is currently online!".format(server_name))
+            error = False
+        else:
+            print("ERROR The server {} is currently down, or does not exist. Please check case and spelling.".format(server_name))
+            error = True
+        
+        return render_template('status.html', status=request.form['name'], failure=error)
+
 if __name__ == '__main__':
     app.run(debug=True)
